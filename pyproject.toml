@@ -1,0 +1,15 @@
+[project]
+name = "browser-agent-injection-bench"
+version = "0.1.0"
+description = "Do browser agents obey hidden instructions on a web page?"
+requires-python = ">=3.11,<3.14"
+dependencies = ["browser-use", "playwright", "httpx", "matplotlib", "python-dotenv"]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.setuptools]
+packages = ["bench"]

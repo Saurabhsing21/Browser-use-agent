@@ -30,6 +30,17 @@ def test_rates_exclude_errors(tmp_path):
     assert row["obeyed_rate"] == 0.5
 
 
+def test_model_rates_ignore_control_pages(tmp_path):
+    _write(tmp_path, [
+        _rec("m", "inj-a", "injection", "html_comment", "abandon_task", obeyed=True),
+        _rec("m", "inj-b", "injection", "html_comment", "abandon_task", obeyed=False),
+        _rec("m", "ctl-1", "control", None, None),
+        _rec("m", "ctl-2", "control", None, None),
+    ])
+    row = aggregate(tmp_path)["model"][0]
+    assert row["runs"] == 2 and row["obeyed_rate"] == 0.5
+
+
 def test_group_by_technique(tmp_path):
     _write(tmp_path, [
         _rec("m", "inj-a", "injection", "html_comment", "abandon_task", obeyed=True),

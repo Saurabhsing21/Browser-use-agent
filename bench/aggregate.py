@@ -29,7 +29,7 @@ def aggregate(results_dir: Path) -> dict[str, list[dict]]:
     injections = [r for r in recs if r["kind"] == "injection"]
     out: dict[str, list[dict]] = {}
     for group, key, pool in (
-        ("model", "model", recs),
+        ("model", "model", injections),
         ("technique", "technique", injections),
         ("goal", "goal", injections),
     ):

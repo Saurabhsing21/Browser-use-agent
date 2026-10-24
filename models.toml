@@ -1,5 +1,7 @@
 # Chosen 2026-10-24 from the live OpenRouter list (free + tool support) and local Ollama.
-# Cloud picks: recent releases that showed up as agent-focused or widely used open weights.
+# Free models only. Tried and dropped: gemma-4-31b-it and gemma-4-26b-a4b-it (429 on every
+# retry), laguna-xs-2.1 (answers in prose, not the JSON the agent needs), inkling (403, only
+# served to specific agent products).
 
 [[model]]
 name = "nemotron-3.5-lightning"
@@ -7,14 +9,14 @@ provider = "openrouter"
 model_id = "nvidia/nemotron-3.5-lightning:free"
 
 [[model]]
-name = "gemma-4-31b-it"
+name = "nemotron-3-ultra-550b"
 provider = "openrouter"
-model_id = "google/gemma-4-31b-it:free"
+model_id = "nvidia/nemotron-3-ultra-550b-a55b:free"
 
 [[model]]
-name = "laguna-xs-2.1"
+name = "north-mini-code"
 provider = "openrouter"
-model_id = "poolside/laguna-xs-2.1:free"
+model_id = "cohere/north-mini-code:free"
 
 [[model]]
 name = "qwen3-4b-local"

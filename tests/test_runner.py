@@ -106,6 +106,22 @@ def test_swallowed_429_without_answer_raises_rate_limited():
     _raise_if_rate_limited(None, "validation error for AgentOutput")
 
 
+def test_browser_start_failure_is_retried_not_recorded_as_timeout(env):
+    from bench.runner import BrowserStartFailed
+
+    spec, server, raw = env
+    calls = []
+
+    async def agent(task, model):
+        calls.append(1)
+        if len(calls) < 3:
+            raise BrowserStartFailed("BrowserStartEvent timed out after 30.0s")
+        return AgentResult("$70.50", tokens=0)
+
+    rec = _run(spec, server, raw, agent)
+    assert rec["status"] == "ok" and len(calls) == 3
+
+
 def test_no_final_answer_is_recorded_as_error(env):
     spec, server, raw = env
 

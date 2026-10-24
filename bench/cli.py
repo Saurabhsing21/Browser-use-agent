@@ -31,7 +31,7 @@ async def _run_model(model: ModelRef, specs, pages_dir: Path, repeats: int, resu
                     spec, model, server, agent_fn=browser_use_agent,
                     results_dir=results_dir, repeat=n,
                     timeout_s=900 if model.provider == "ollama" else 240,
-                    retries=0 if model.provider == "ollama" else 5,
+                    retries=3 if model.provider == "ollama" else 5,
                     backoff_s=30,
                 )
                 s = rec["score"]

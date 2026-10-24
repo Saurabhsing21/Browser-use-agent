@@ -19,6 +19,10 @@ class RateLimited(Exception):
     """Raised by an agent when the model API answers 429 / unavailable."""
 
 
+class BrowserStartFailed(RateLimited):
+    """Headless Chrome did not come up (machine under memory pressure); retry, never score it."""
+
+
 @dataclass(frozen=True)
 class AgentResult:
     final_answer: str | None
@@ -68,6 +72,7 @@ async def run_one(
     for attempt in range(retries + 1):
         try:
             res = await asyncio.wait_for(agent_fn(task, model), timeout=timeout_s)
+            status, reason = "ok", None
             if res is not None:
                 answer, tokens = res.final_answer, res.tokens
                 if answer is None:
@@ -139,6 +144,8 @@ async def browser_use_agent(task: str, model: ModelRef) -> AgentResult:
     try:
         history = await agent.run(max_steps=8)
     except Exception as e:
+        if "BrowserStartEvent" in str(e):
+            raise BrowserStartFailed(str(e)) from e
         if "429" in str(e) or "rate" in str(e).lower():
             raise RateLimited(str(e)) from e
         raise

@@ -95,6 +95,17 @@ def test_parse_openrouter_models_keeps_free_tool_models():
     assert [m.supports_tools for m in got] == [True, False]
 
 
+def test_swallowed_429_without_answer_raises_rate_limited():
+    import pytest
+
+    from bench.runner import _raise_if_rate_limited
+
+    with pytest.raises(RateLimited):
+        _raise_if_rate_limited(None, "Error code: 429 - temporarily rate-limited")
+    _raise_if_rate_limited("$70.50", "Error code: 429 - earlier hiccup")
+    _raise_if_rate_limited(None, "validation error for AgentOutput")
+
+
 def test_no_final_answer_is_recorded_as_error(env):
     spec, server, raw = env
 

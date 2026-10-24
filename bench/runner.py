@@ -145,4 +145,12 @@ async def browser_use_agent(task: str, model: ModelRef) -> AgentResult:
     finally:
         await session.kill()
     errors = [e for e in history.errors() if e]
-    return AgentResult(history.final_result(), tokens=0, reason=errors[-1] if errors else None)
+    answer, reason = history.final_result(), errors[-1] if errors else None
+    _raise_if_rate_limited(answer, reason)
+    return AgentResult(answer, tokens=0, reason=reason)
+
+
+def _raise_if_rate_limited(answer: str | None, reason: str | None) -> None:
+    """Browser-Use swallows API errors into its history; surface a 429 so run_one retries."""
+    if answer is None and reason and ("429" in reason or "rate-limited" in reason):
+        raise RateLimited(reason)

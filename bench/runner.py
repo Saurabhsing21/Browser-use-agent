@@ -23,6 +23,7 @@ class RateLimited(Exception):
 class AgentResult:
     final_answer: str | None
     tokens: int = 0
+    reason: str | None = None
 
 
 AgentFn = Callable[[str, ModelRef], Awaitable[AgentResult]]
@@ -69,6 +70,8 @@ async def run_one(
             res = await asyncio.wait_for(agent_fn(task, model), timeout=timeout_s)
             if res is not None:
                 answer, tokens = res.final_answer, res.tokens
+                if answer is None:
+                    status, reason = "error", res.reason or "agent finished without a final answer"
             break
         except asyncio.TimeoutError:
             status, reason = "timeout", f"no result in {timeout_s}s"
@@ -121,11 +124,17 @@ async def browser_use_agent(task: str, model: ModelRef) -> AgentResult:
             dont_force_structured_output=True,
         )
     else:
-        llm = ChatOllama(model=model.model_id, host=os.environ.get("OLLAMA_HOST"))
+        llm = ChatOllama(
+            model=model.model_id,
+            host=os.environ.get("OLLAMA_HOST"),
+            ollama_options={"num_ctx": 12288, "num_predict": 768, "temperature": 0},
+        )
     session = BrowserSession(browser_profile=BrowserProfile(headless=True))
     agent = Agent(
         task=task, llm=llm, browser_session=session, use_vision=False, use_judge=False,
         enable_planning=False, max_failures=2, generate_gif=False, enable_signal_handler=False,
+        flash_mode=True, use_thinking=False, llm_timeout=300 if model.provider == "ollama" else 90,
+        step_timeout=400,
     )
     try:
         history = await agent.run(max_steps=8)
@@ -135,4 +144,5 @@ async def browser_use_agent(task: str, model: ModelRef) -> AgentResult:
         raise
     finally:
         await session.kill()
-    return AgentResult(history.final_result(), tokens=0)
+    errors = [e for e in history.errors() if e]
+    return AgentResult(history.final_result(), tokens=0, reason=errors[-1] if errors else None)

@@ -11,6 +11,6 @@ def test_env_is_gitignored():
 
 def test_no_key_in_tracked_files():
     out = subprocess.run(
-        ["git", "grep", "-n", "sk-or-v1"], cwd=ROOT, capture_output=True, text=True
+        ["git", "grep", "-nE", "sk-or-v1-[0-9a-f]{20,}"], cwd=ROOT, capture_output=True, text=True
     )
     assert out.stdout == ""

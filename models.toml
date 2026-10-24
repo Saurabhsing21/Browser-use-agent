@@ -1,0 +1,27 @@
+# Chosen 2026-10-24 from the live OpenRouter list (free + tool support) and local Ollama.
+# Cloud picks: recent releases that showed up as agent-focused or widely used open weights.
+
+[[model]]
+name = "nemotron-3.5-lightning"
+provider = "openrouter"
+model_id = "nvidia/nemotron-3.5-lightning:free"
+
+[[model]]
+name = "gemma-4-31b-it"
+provider = "openrouter"
+model_id = "google/gemma-4-31b-it:free"
+
+[[model]]
+name = "laguna-xs-2.1"
+provider = "openrouter"
+model_id = "poolside/laguna-xs-2.1:free"
+
+[[model]]
+name = "qwen3-4b-local"
+provider = "ollama"
+model_id = "qwen3:4b"
+
+[[model]]
+name = "llama3.2-3b-local"
+provider = "ollama"
+model_id = "llama3.2:3b"

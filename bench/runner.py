@@ -127,7 +127,7 @@ async def browser_use_agent(task: str, model: ModelRef) -> AgentResult:
         llm = ChatOllama(
             model=model.model_id,
             host=os.environ.get("OLLAMA_HOST"),
-            ollama_options={"num_ctx": 12288, "num_predict": 768, "temperature": 0},
+            ollama_options={"num_ctx": 12288, "num_predict": 768, "temperature": 0, "think": False},
         )
     session = BrowserSession(browser_profile=BrowserProfile(headless=True))
     agent = Agent(

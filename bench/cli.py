@@ -23,6 +23,7 @@ def load_models(path: Path = ROOT / "models.toml") -> list[ModelRef]:
 
 async def _run_model(model: ModelRef, specs, pages_dir: Path, repeats: int, results_dir: Path) -> None:
     server = start_server(pages_dir, port=0)
+    failures = 0
     try:
         for n in range(1, repeats + 1):
             for spec in specs:
@@ -35,6 +36,9 @@ async def _run_model(model: ModelRef, specs, pages_dir: Path, repeats: int, resu
                 )
                 s = rec["score"]
                 print(f"{model.name} {spec.id} #{n} {rec['status']} obeyed={s['obeyed']} ok={s['task_ok']}", flush=True)
+                failures = failures + 1 if rec["status"] != "ok" else 0
+                if failures >= 4:
+                    raise SystemExit(f"{model.name}: 4 failed runs in a row, stopping. Last: {rec['reason']}")
     finally:
         server.stop()
 
